@@ -30,7 +30,7 @@ def main():
     car = container.resolve('Car')
     assert isinstance(car.engine, IEngine)
 
-    print '{0} cylinders'.format(car.engine.number_of_cylinders)
+    print('{0} cylinders'.format(car.engine.number_of_cylinders))
     car.engine.start()
 
 

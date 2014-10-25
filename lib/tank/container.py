@@ -1,10 +1,31 @@
+import logging
 import sys
+from abc import ABCMeta, abstractmethod
 
 
-class Container:
+from tank.installer import IInstaller
+
+
+class IContainer:
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def register(self, interface, implementation=None, factory_method=None):
+        raise Exception("Please a concrete implementation")
+
+
+class Container(IContainer):
+    Log = logging.getLogger(__name__)
+
     def __init__(self):
         self.__registrations = dict()
         self.__instances = dict()
+
+    def install(self, *installers):
+        for installer in installers:
+            if not isinstance(installer, IInstaller):
+                continue
+            installer.install(self)
 
     def register(self, interface, implementation=None, factory_method=None):
         if implementation or factory_method:
@@ -16,6 +37,11 @@ class Container:
             self.__registrations[interface] = interface
 
     def resolve(self, type_name):
+        self.Log.info("Resolving type: '{0}'".format(type_name))
+
+        if type_name not in self.__registrations.keys():
+            raise Exception('Unable to resolve type {0} - no registrations found'.format(type_name))
+
         implementation = self.__registrations[type_name]
         module = '__main__'
         class_name = implementation
