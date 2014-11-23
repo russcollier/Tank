@@ -6,4 +6,4 @@ class IInstaller:
 
     @abstractmethod
     def install(self, container):
-        raise Exception("Please a concrete implementation")
+        raise NotImplementedError('Please a concrete implementation')

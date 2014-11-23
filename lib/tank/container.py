@@ -1,9 +1,10 @@
+import inspect
 import logging
 import sys
 from abc import ABCMeta, abstractmethod
 
 
-from tank.installer import IInstaller
+from tank.exception import ComponentNotFoundException
 
 
 class IContainer:
@@ -11,7 +12,7 @@ class IContainer:
 
     @abstractmethod
     def register(self, interface, implementation=None, factory_method=None):
-        raise Exception("Please a concrete implementation")
+        raise NotImplementedError('Please a concrete implementation')
 
 
 class Container(IContainer):
@@ -23,8 +24,6 @@ class Container(IContainer):
 
     def install(self, *installers):
         for installer in installers:
-            if not isinstance(installer, IInstaller):
-                continue
             installer.install(self)
 
     def register(self, interface, implementation=None, factory_method=None):
@@ -40,19 +39,28 @@ class Container(IContainer):
         self.Log.info("Resolving type: '{0}'".format(type_name))
 
         if type_name not in self.__registrations.keys():
-            raise Exception('Unable to resolve type {0} - no registrations found'.format(type_name))
+            raise ComponentNotFoundException('Unable to resolve type {0} - no registrations found'.format(type_name))
 
-        implementation = self.__registrations[type_name]
+        implementation_type_name = self.__registrations[type_name]
         module = '__main__'
-        class_name = implementation
+        class_name = implementation_type_name
 
-        if '.' in implementation:
-            module = implementation.rsplit('.', 1)[0]
-            class_name = implementation.rsplit('.', 1)[1]
+        need_to_create_implementation = False
 
-        __import__(module, fromlist=class_name)
-        module = sys.modules[module]
-        class_object = getattr(module, class_name)
+        if isinstance(implementation_type_name, str):
+            need_to_create_implementation = True
+            if '.' in implementation_type_name:
+                module = implementation_type_name.rsplit('.', 1)[0]
+                class_name = implementation_type_name.rsplit('.', 1)[1]
+
+            __import__(module, fromlist=class_name)
+            module = sys.modules[module]
+            class_object = getattr(module, class_name)
+        elif inspect.isclass(implementation_type_name):
+            need_to_create_implementation = True
+            class_object = implementation_type_name
+        else:
+            class_object = implementation_type_name
 
         docs = class_object.__doc__
         args = []
@@ -67,10 +75,13 @@ class Container(IContainer):
                 args.append(self.resolve(type_name))
 
         if class_name not in self.__instances.keys():
-            if len(args) > 0:
-                instance = class_object(*args)
+            if need_to_create_implementation:
+                if len(args) > 0:
+                    instance = class_object(*args)
+                else:
+                    instance = class_object()
             else:
-                instance = class_object()
+                instance = class_object
             self.__instances[class_name] = instance
 
         return self.__instances[class_name]
