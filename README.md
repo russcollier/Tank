@@ -1,7 +1,7 @@
 Tank
 ==========
 
-Tank is a lightweight [inversion of control](http://en.wikipedia.org/wiki/Inversion_of_control) (IoC) container for Python, inspired by the [Castle project's](http://www.castleproject.org/) [Windsor container](http://docs.castleproject.org/Windsor.MainPage.ashx).
+Tank is a lightweight [inversion of control](http://en.wikipedia.org/wiki/Inversion_of_control) (IoC) container for Python, inspired by the [Castle project's](http://www.castleproject.org/) [Windsor container](http://docs.castleproject.org/Windsor.MainPage.ashx) for the .NET Framework.
 
 If you follow some established software development best practices like single responsibility principle, coding to interfaces/abstractions, dependency injection, etc. you can become forced to build smaller, more focused components. However, the trade off is typically increased complexity, especially around object creation. In order to create one component, you may need to create several other components, which require other components, and so on and so forth.
 
