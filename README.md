@@ -1,7 +1,11 @@
 Tank
 ==========
 
-A lightweight [inversion of control container](http://en.wikipedia.org/wiki/Inversion_of_control) for Python, inspired by the [Castle project's](http://www.castleproject.org/) [Windsor container](http://docs.castleproject.org/Windsor.MainPage.ashx).
+Tank is a lightweight [inversion of control container](http://en.wikipedia.org/wiki/Inversion_of_control) (IoC) for Python, inspired by the [Castle project's](http://www.castleproject.org/) [Windsor container](http://docs.castleproject.org/Windsor.MainPage.ashx).
+
+If you follow some established software development best practices like single responsibility, coding to interfaces/abstractions, dependency injection, etc. you can become forced to build smaller, more focused comonents. However, the trade off is typically increased complexity around object creation because in order to create one component, you may need to create several other components, which require other components, and so on and so forth.
+
+Using an IoC container like Tank, you can reduce some of this object creation complexity in your own code by making it the container's problem.
 
 Overview
 ========
@@ -23,8 +27,8 @@ That is the job of a container.
 
 <sub>Quotes from the Castle Windsor docs: http://docs.castleproject.org/Windsor.Services-and-Components.ashx</sub>
 
-How Services Are Registered
-===========================
+## How Services Are Registered
+
 Once you have a container created, the basic way to register your services with it is by calling the container's <code>register()</code> method.
 
 This method typically takes two arguments:
@@ -36,14 +40,14 @@ Alternatively, you can just registered the fully qualified class name of the com
 
 The last service registration wins. Basically the container is internally tracking all of the registrations it is given, so if you try to register the same component twice, the last registration will supercede all previous registrations (this may change).
 
-How Components Are Created
-==========================
+## How Components Are Created
+
 The container only creates components when it is asked to "resolve" them, either explicitly, or while resolving the dependencies of another component. So even if you registered 100 services, but only tried to resolve one of them (whose component didn't have any dependencies), the container would only ever create that one service's component object/instance.
 
 The container internally keeps track of each instance it creates. So basically each component is treated as a [Singleton](http://en.wikipedia.org/wiki/Singleton_pattern) where only one instance is created for the life time of the application. That is of course, assuming you leave the creation of that component class entirely up to the container!
 
-How Dependencies Are Configured
-==============================
+## How Dependencies Are Configured
+
 For better or for worse, Python doesn't have a clear cut form of type hinting that Tank can use to figure out which service it should resolve for a particular component dependency (or if there is one and I'm just missing it, please let me know!).
 
 To workaround this, Tank relies on special markup in a component class' docstring. In the class docstring, you list your dependencies' (i.e. \_\_init\_\_ arguments) fully qualified class names each on their own line and preceded with an @ character.
@@ -64,8 +68,8 @@ So when the container tries to resolve the component named MyComponent, it will 
 
 It ain't pretty, but it works for now.
 
-Basic Example
-=============
+## Basic Example
+
 ```python
 class Car:
     """
@@ -86,8 +90,27 @@ car = container.resolve('Car')
 assert isinstance(car.engine, IEngine)
 ```
 
-Installers
-==========
+Slightly More Advanced Topics
+=============================
+
+## Factory Methods
+Sometimes for a variety of reasons, you don't want to (or can't) give the container total control over object creation. In these situations, you can still leverage the container for resolving your services by using factory methods for component registrations.
+
+You do this using the container's <code>register()</code> method's <code>factory_method</code> argument, giving it either the name of the function or method to call, or just a lambda to execute (with no parameters).
+
+### Factory Method Exapmle
+
+```python
+container = Container()
+container.register('tests.cars.IEngine', factory_method=lambda: SixCylinder())
+container.register('Car')
+
+car = container.resolve('Car')
+assert isinstance(car.engine, IEngine)
+```
+
+## Installers
+
 Installers give developers a way to group together related sets of service registrations into more reusable chunks.
 
 To make an installer, you simply create a class that implements the tank.installer.IInstaller "interface", which is basically just one method where you are given the container. Then you perform your registrations on the container inside your installer.
@@ -96,8 +119,8 @@ To use your installer, you simply create an instance of it and give it to the co
 
 Then you can do things like define an installer for each of your modules or submodules to have a more convenient way to install your module's services into the container.
 
-Installers Example
-==================
+### Installers Example
+
 ```python
 class InstallerForProd(IInstaller):
     def install(self, container):
