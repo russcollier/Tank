@@ -5,7 +5,7 @@ Tank is a lightweight [inversion of control](http://en.wikipedia.org/wiki/Invers
 
 If you follow some established software development best practices like single responsibility principle, coding to interfaces/abstractions, dependency injection, etc. you can become forced to build smaller, more focused components. However, the trade off is typically increased complexity, especially around object creation. In order to create one component, you may need to create several other components, which require other components, and so on and so forth.
 
-Using an IoC container like Tank, you can reduce some of this object creation complexity in your own code by making it the container's problem. This keeps object creation concerns out of your code, so you don't have to couple yourself to implementations and clutter your own logic with object creation boilerplate.
+Using an IoC container like Tank, you can reduce some of this object creation complexity in your own code by making that complexity the container's problem. This keeps object creation concerns out of your code, so you don't have to couple yourself to implementations and clutter your own logic with object creation boilerplate.
 
 Overview
 ========
