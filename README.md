@@ -5,7 +5,7 @@ Tank is a lightweight [inversion of control](http://en.wikipedia.org/wiki/Invers
 
 If you follow some established software development best practices like single responsibility principle, coding to interfaces/abstractions, dependency injection, etc. you can become forced to build smaller, more focused components. However, the trade off is typically increased complexity, especially around object creation. In order to create one component, you may need to create several other components, which require other components, and so on and so forth.
 
-Using an IoC container like Tank, you can reduce some of this object creation complexity in your own code by making it the container's problem.
+Using an IoC container like Tank, you can reduce some of this object creation complexity in your own code by making it the container's problem. This keeps object creation concerns out of your code, so you don't have to couple yourself to implementations and clutter your own logic with object creation boilerplate.
 
 Overview
 ========
@@ -45,6 +45,8 @@ The last service registration wins. Basically the container is internally tracki
 The container only creates components when it is asked to "resolve" them, either explicitly, or while resolving the dependencies of another component. So even if you registered 100 services, but only tried to resolve one of them (whose component didn't have any dependencies), the container would only ever create that one service's component object/instance.
 
 The container internally keeps track of each instance it creates. So basically each component is treated as a [Singleton](http://en.wikipedia.org/wiki/Singleton_pattern) where only one instance is created for the life time of the application. That is of course, assuming you leave the creation of that component class entirely up to the container!
+
+Also it's worth noting that when we refer to components, we're referring to classes that implement interfaces. Not all of your classes will fit into this definition (and thus shouldn't be controlled by the container), particularly things like domain model classes, DTOs, etc.
 
 ## How Dependencies Are Configured
 
