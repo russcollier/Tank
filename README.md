@@ -50,7 +50,7 @@ Also it's worth noting that when we refer to components, we're referring to clas
 
 ## How Dependencies Are Configured
 
-For better or for worse, Python doesn't have a clear cut form of type hinting that Tank can use to figure out which service it should resolve for a particular component dependency (or if there is one and I'm just missing it, please let me know!).
+For better or for worse, Python doesn't have a clear cut form of type hinting that Tank can use to figure out which component it should resolve for a particular dependency (or if there is one and I'm just missing it, please let me know!).
 
 To workaround this, Tank relies on special markup in a component class' docstring. In the class docstring, you list your dependencies' (i.e. \_\_init\_\_ arguments) fully qualified class names each on their own line and preceded with an @ character.
 
