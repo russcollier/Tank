@@ -66,12 +66,11 @@ class Container(IContainer):
         args = []
 
         if docs:
-            for line in docs.split('@'):
+            for line in docs.split('\n'):
                 line = line.strip()
-                if line is None or line == '':
+                if line is None or line == '' or line[0] != '@':
                     continue
-
-                type_name = line
+                type_name = line[1:]
                 args.append(self.resolve(type_name))
 
         if class_name not in self.__instances.keys():
